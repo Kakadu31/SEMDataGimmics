@@ -11,7 +11,7 @@ import shutil, os
 path = "E:\CodingStuff\ZnO_Test_data" #Path to atlas folder
 newDirName = "Images"
 
-prefix = "l40f_f"
+prefix = "l40_f"
 iteratortype = "alphabet"
 suffix = "_muh"
 if iteratortype == "number":
@@ -21,8 +21,8 @@ elif iteratortype == "alphabet":
 else:
     iterator = 0
 
-startRegion = 4
-stopRegion = 17
+startRegion = 18
+stopRegion = 29
 regionList = createReagionList(startRegion, stopRegion)
 print(regionList)
 
