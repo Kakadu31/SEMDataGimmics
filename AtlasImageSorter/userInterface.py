@@ -4,10 +4,20 @@ Created on 5 Jun 2022
 @author: Sebastien
 '''
 import tkinter as tk
-import subprocess, shutil, os
+import shutil, os
 from functions import extendPath, accesRegion, getImage, makeNewDir, createReagionList, makeImageName
+from tkinter import filedialog
 
-def startExport(event):
+path = ""
+
+def changeDirectory():
+    # get a directory
+    filepath=filedialog.askdirectory(initialdir=r"F:\python\pythonProject",
+                                    title="Dialog box")
+    entryPath.delete(0, "end")
+    entryPath.insert(0, filepath)
+
+def startExport():
     #Set Variables
     path = entryPath.get()
     newDirName = entryNewDir.get()
@@ -20,8 +30,10 @@ def startExport(event):
     iteratorStart = entryIterator.get()
     if iteratorStart.isnumeric():
         iteratortype = "number"
+        iterator = int(iteratorStart)
     elif iteratorStart.isalpha():
         iteratortype = "alphabet"
+        iterator = iteratorStart
     else:
         iteratortype = "unknown"
     suffix = entrySuffix.get()
@@ -31,7 +43,6 @@ def startExport(event):
 
     #Acces path to the images
     extPath = extendPath(path)                  #Acces the session folder inside the Atlas folder
-    iterator = iteratorStart
     for region in regionList:
         try:
             regionPath = accesRegion(extPath, region)   #Acces the region folder inside the session folder
@@ -90,6 +101,15 @@ entryPath = tk.Entry(
     width=50
 )
 entryPath.insert(0, "Enter the path to the Atlas folder.")
+buttonDirectory = tk.Button(
+    master=frameMain,
+    command=changeDirectory,
+    text="Search",
+    fg="white",
+    bg="#0056bc",
+    width=5,
+    #height=1
+)
 
 #New folder elements
 labelNewDir = tk.Label(
@@ -205,6 +225,7 @@ frameStart = tk.Frame(
     )
 buttonStart = tk.Button(
     master=frameStart,
+    command=startExport,
     text="Export",
     fg="white",
     bg="#0056bc",
@@ -220,6 +241,7 @@ labelTop.grid(row=0, column=0, sticky = "w")
 frameMain.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
 labelPath.grid(row=0, column=0, sticky = "nw")
 entryPath.grid(row=0, column=1, sticky = "nw")
+buttonDirectory.grid(row=0, column=2, sticky = "nw")
 labelNewDir.grid(row=1, column=0, sticky = "nw")
 entryNewDir.grid(row=1, column=1, sticky = "nw")
 labelRegions.grid(row=2, column=0, sticky = "nw")
@@ -243,6 +265,6 @@ labelSpacer2.grid(row=2, column=0, sticky = "nw")
 # Start button
 buttonStart.pack()
 frameStart.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
-buttonStart.bind("<Button-1>", startExport)
+#buttonStart.bind("<Button-1>", startExport)
 root.mainloop()
 
