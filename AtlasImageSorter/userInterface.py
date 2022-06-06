@@ -4,7 +4,9 @@ Created on 5 Jun 2022
 @author: Sebastien
 '''
 import tkinter as tk
-import shutil, os
+import numpy as np
+import shutil, os 
+from PIL import Image
 from functions import extendPath, accesRegion, getImage, makeNewDir, createReagionList, makeImageName
 from tkinter import filedialog
 
@@ -17,6 +19,38 @@ def changeDirectory():
     entryPath.delete(0, "end")
     entryPath.insert(0, filepath)
 
+def makeCollage():
+    rows = int(spinboxY.get())
+    columns = int(spinboxX.get())
+    targetDir = os.path.join(entryPath.get(), entryNewDir.get())
+    lpaths = []
+    lImgs = []
+    valid_images = [".jpg",".gif",".png",".tif"]
+    collageRows = []
+    # Get all pictures from the directory and write them in a list
+    for f in os.listdir(targetDir):
+        ext = os.path.splitext(f)[1]
+        if ext.lower() not in valid_images:
+            continue
+        elif "Collage" in os.path.splitext(f)[0]:
+            continue
+        lpaths.append(f)
+        lpaths.sort()
+    for p in lpaths:
+        lImgs.append(Image.open(os.path.join(targetDir, p)))
+    # Divide the list into rows and columns
+    lArrayImgs = [lImgs[i:i+columns] for i in range(0, len(lImgs), columns)]
+    # Create horizontal row image(array)-stripes from the rows
+    for i in range(rows):
+            print(i)
+            collageRows.append(np.hstack( (np.asarray( image ) for image in lArrayImgs[i] ) ))
+    #Create vertical image collage from the previous generated stripes
+    collage = np.vstack( (np.asarray( row ) for row in collageRows ) )
+    #Convert array to image and save it
+    collageDone = Image.fromarray(collage)
+    collageDone.save(os.path.join(targetDir, "Collage"+str(columns)+"x"+str(rows)+".tif"))
+    print ("done")
+
 def startExport():
     #Set Variables
     path = entryPath.get()
@@ -25,6 +59,9 @@ def startExport():
     startRegion = int(entryRegionStart.get())
     stopRegion = int(entryRegionEnd.get())
     regionList = createReagionList(startRegion, stopRegion)
+    
+    spinboxX.delete(0, "end")
+    spinboxX.insert(0, abs(stopRegion-startRegion))
     
     prefix = entryPrefix.get()
     iteratorStart = entryIterator.get()
@@ -58,6 +95,7 @@ def startExport():
             #im.show()
         except:
             pass    # let exception propagate if we just can't
+    
 
 #main window
 root = tk.Tk()
@@ -232,6 +270,27 @@ buttonStart = tk.Button(
     width=50,
     height=2
 )
+buttonCollage = tk.Button(
+    master=frameStart,
+    command=makeCollage,
+    text="Collage",
+    fg="white",
+    bg="#0056cd",
+    width=10,
+    height=2
+)
+spinboxX = tk.Spinbox(
+    master=frameStart,
+    from_=0,
+    to=10,
+    width=2
+    )
+spinboxY = tk.Spinbox(
+    master=frameStart,
+    from_=0,
+    to=10,
+    width=2
+    )
 
 # Top elements
 frameTop.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
@@ -263,7 +322,11 @@ entrySuffix.grid(row=1, column=2, sticky = "s")
 labelSpacer2.grid(row=2, column=0, sticky = "nw")
 
 # Start button
+spinboxY.pack(side = tk.RIGHT)
+spinboxX.pack(side = tk.RIGHT)
+buttonCollage.pack(side = tk.RIGHT)
 buttonStart.pack()
+#buttonCollage.pack(side = tk.RIGHT)
 frameStart.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
 #buttonStart.bind("<Button-1>", startExport)
 root.mainloop()
