@@ -1,7 +1,7 @@
 '''
 Created on 2 Mar 2020
 
-@author: Sebastien
+@author: Kakadu31
 '''
 #Suitable for lightt microscopes by changing the values in line 577
 #Suitable for tescan, Jeol and Zeiss electorn microscope from the philipss university of marburg
